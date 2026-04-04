@@ -52,18 +52,18 @@ DisplaySettingsBottomSheetView::DisplaySettingsBottomSheetView(
     DisplaySettingsViewModel* viewModel, const MaterialColorScheme* materialColorScheme,
     const IFontRepository* fontRepository)
     : _viewModel(viewModel)
-    , _titleLabel(128, 16, 25, fontRepository->GetFont(FontType::Medium11))
-    , _layoutLabel(64, 16, 25, fontRepository->GetFont(FontType::Regular10))
-    , _sortingLabel(64, 16, 25, fontRepository->GetFont(FontType::Regular10))
+    , _titleLabel(Label2DView::CreateShared(128, 16, 25, fontRepository->GetFont(FontType::Medium11)))
+    , _layoutLabel(Label2DView::CreateShared(64, 16, 25, fontRepository->GetFont(FontType::Regular10)))
+    , _sortingLabel(Label2DView::CreateShared(64, 16, 25, fontRepository->GetFont(FontType::Regular10)))
     , _materialColorScheme(materialColorScheme)
     // , _filtersLabel(64, 16, 25, fontRepository->GetFont(FontType::Regular10))
 {
-    _titleLabel.SetText(u"Display Settings");
-    AddChildTail(&_titleLabel);
-    _layoutLabel.SetText(u"Layout");
-    AddChildTail(&_layoutLabel);
-    _sortingLabel.SetText(u"Sorting");
-    AddChildTail(&_sortingLabel);
+    _titleLabel->SetText(u"Display Settings");
+    AddChildTail(_titleLabel.GetPointer());
+    _layoutLabel->SetText(u"Layout");
+    AddChildTail(_layoutLabel.GetPointer());
+    _sortingLabel->SetText(u"Sorting");
+    AddChildTail(_sortingLabel.GetPointer());
     // _filtersLabel.SetText(u"Filters");
     // AddChildTail(&_filtersLabel);
 
@@ -175,9 +175,9 @@ void DisplaySettingsBottomSheetView::InitVram(const VramContext& vramContext)
 
 void DisplaySettingsBottomSheetView::UpdateLabels()
 {
-    _titleLabel.SetPosition(TITLE_LABEL_X, _position.y + TITLE_LABEL_Y);
-    _layoutLabel.SetPosition(LAYOUT_LABEL_X, _position.y + LAYOUT_LABEL_Y);
-    _sortingLabel.SetPosition(SORTING_LABEL_X, _position.y + SORTING_LABEL_Y);
+    _titleLabel->SetPosition(TITLE_LABEL_X, _position.y + TITLE_LABEL_Y);
+    _layoutLabel->SetPosition(LAYOUT_LABEL_X, _position.y + LAYOUT_LABEL_Y);
+    _sortingLabel->SetPosition(SORTING_LABEL_X, _position.y + SORTING_LABEL_Y);
     // _filtersLabel.SetPosition(FILTERS_LABEL_X, _position.y + FILTERS_LABEL_Y);
 }
 
@@ -222,12 +222,12 @@ void DisplaySettingsBottomSheetView::Draw(GraphicsContext& graphicsContext)
     graphicsContext.SetClipArea(GetBounds());
     u32 oldPrio = graphicsContext.SetPriority(1);
     {
-        _titleLabel.SetBackgroundColor(_materialColorScheme->GetColor(md::sys::color::surfaceContainerLow));
-        _titleLabel.SetForegroundColor(_materialColorScheme->onSurface);
-        _layoutLabel.SetBackgroundColor(_materialColorScheme->GetColor(md::sys::color::surfaceContainerLow));
-        _layoutLabel.SetForegroundColor(_materialColorScheme->onSurfaceVariant);
-        _sortingLabel.SetBackgroundColor(_materialColorScheme->GetColor(md::sys::color::surfaceContainerLow));
-        _sortingLabel.SetForegroundColor(_materialColorScheme->onSurfaceVariant);
+        _titleLabel->SetBackgroundColor(_materialColorScheme->GetColor(md::sys::color::surfaceContainerLow));
+        _titleLabel->SetForegroundColor(_materialColorScheme->onSurface);
+        _layoutLabel->SetBackgroundColor(_materialColorScheme->GetColor(md::sys::color::surfaceContainerLow));
+        _layoutLabel->SetForegroundColor(_materialColorScheme->onSurfaceVariant);
+        _sortingLabel->SetBackgroundColor(_materialColorScheme->GetColor(md::sys::color::surfaceContainerLow));
+        _sortingLabel->SetForegroundColor(_materialColorScheme->onSurfaceVariant);
         // _filtersLabel.SetBackgroundColor(_materialColorScheme->GetColor(md::sys::color::surfaceContainerLow));
         // _filtersLabel.SetForegroundColor(_materialColorScheme->onSurfaceVariant);
         BottomSheetView::Draw(graphicsContext);
@@ -245,6 +245,38 @@ bool DisplaySettingsBottomSheetView::HandleInput(
         return true;
     }
     return false;
+}
+
+void DisplaySettingsBottomSheetView::HandlePenDown(const Point& touchPoint, FocusManager& focusManager)
+{
+    BottomSheetView::HandlePenDown(touchPoint, focusManager);
+
+    if (!GetBounds().Contains(touchPoint))
+    {
+        _oobPenDown = true;
+    }
+}
+
+void DisplaySettingsBottomSheetView::HandlePenMove(const Point& touchPoint, FocusManager& focusManager)
+{
+    BottomSheetView::HandlePenMove(touchPoint, focusManager);
+
+    if (GetBounds().Contains(touchPoint))
+    {
+        _oobPenDown = false;
+    }
+}
+
+void DisplaySettingsBottomSheetView::HandlePenUp(const Point& lastTouchPoint, FocusManager& focusManager)
+{
+    BottomSheetView::HandlePenUp(lastTouchPoint, focusManager);
+
+    if (_oobPenDown && !GetBounds().Contains(lastTouchPoint))
+    {
+        _viewModel->Close();
+    }
+
+    _oobPenDown = false;
 }
 
 SharedPtr<View> DisplaySettingsBottomSheetView::MoveFocus(const SharedPtr<View>& currentFocus,

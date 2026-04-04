@@ -22,7 +22,7 @@ RomBrowserTopScreenView::RomBrowserTopScreenView(
     , _showCover(displayMode->ShowCoverOnTopScreen())
     , _coverPosition(romBrowserViewFactory->GetTopCoverPosition())
 {
-    AddChildTail(_fileInfoView.get());
+    AddChildTail(_fileInfoView.GetPointer());
 }
 
 void RomBrowserTopScreenView::InitVram(const VramContext& vramContext)
