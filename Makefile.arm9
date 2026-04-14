@@ -24,6 +24,10 @@ AUDIODIRS	:=
 
 DEFINES		:= -DLIBTWL_ARM9
 
+ifeq ($(DEBUG),1)
+DEFINES		+= -DDEBUG
+endif
+
 # Libraries
 # ---------
 
