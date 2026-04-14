@@ -18,6 +18,17 @@ RomBrowserController::RomBrowserController(
     , _ioTaskQueue(ioTaskQueue), _bgTaskQueue(bgTaskQueue)
     , _fileTypeProvider(appSettingsService->GetAppSettings()) { }
 
+void RomBrowserController::NavigateUp()
+{
+    if (IsSearchOpenFromStateMachine())
+    {
+        HideSearch();
+        return;
+    }
+
+    NavigateToPath("..");
+}
+
 void RomBrowserController::NavigateToPath(const TCHAR* name)
 {
     StringUtil::Copy(_navigatePath, name, sizeof(_navigatePath) / sizeof(_navigatePath[0]));
@@ -58,6 +69,39 @@ void RomBrowserController::HideDisplaySettings()
         });
     }
     _stateMachine.Fire(RomBrowserStateTrigger::HideDisplaySettings);
+}
+
+void RomBrowserController::ShowSearch()
+{
+    _stateMachine.Fire(RomBrowserStateTrigger::ShowSearch);
+}
+
+void RomBrowserController::HideSearch()
+{
+    _stateMachine.Fire(RomBrowserStateTrigger::HideSearch);
+}
+
+void RomBrowserController::SetSearchQuery(const char* query)
+{
+    if (!query || query[0] == 0)
+    {
+        _searchQuery[0] = 0;
+        return;
+    }
+
+    StringUtil::Copy(_searchQuery, query, sizeof(_searchQuery) / sizeof(_searchQuery[0]));
+}
+
+void RomBrowserController::RefreshRomBrowserViewModel()
+{
+    if (_romBrowserViewModel.IsValid())
+    {
+        _romBrowserViewModel->Refresh();
+    }
+    else
+    {
+        _romBrowserViewModel = SharedPtr<RomBrowserViewModel>::MakeShared(this);
+    }
 }
 
 void RomBrowserController::SetRomBrowserDisplaySettings(
@@ -126,6 +170,14 @@ void RomBrowserController::HandleTrigger()
 
         case RomBrowserStateTrigger::ChangeDisplayMode:
             HandleChangeDisplayModeTrigger();
+            break;
+
+        case RomBrowserStateTrigger::ShowSearch:
+            HandleShowSearchTrigger();
+            break;
+
+        case RomBrowserStateTrigger::HideSearch:
+            HandleHideSearchTrigger();
             break;
 
         default:
@@ -201,6 +253,25 @@ void RomBrowserController::HandleChangeDisplayModeTrigger()
 {
     LOG_DEBUG("RomBrowserStateTrigger::ChangeDisplayMode\n");
     _romBrowserViewModel = SharedPtr<RomBrowserViewModel>::MakeShared(this);
+}
+
+void RomBrowserController::HandleShowSearchTrigger()
+{
+    LOG_DEBUG("RomBrowserStateTrigger::ShowSearch\n");
+    _romBrowserViewModel = SharedPtr<RomBrowserViewModel>::MakeShared(this);
+}
+
+void RomBrowserController::HandleHideSearchTrigger()
+{
+    LOG_DEBUG("RomBrowserStateTrigger::HideSearch\n");
+    _romBrowserViewModel = SharedPtr<RomBrowserViewModel>::MakeShared(this);
+}
+
+bool RomBrowserController::IsSearchOpenFromStateMachine() const
+{
+    // Search currently overlays the Browser state, so visibility is represented by the last trigger.
+    return _stateMachine.GetCurrentState() == RomBrowserState::Browser
+        && _stateMachine.GetLastTrigger() == RomBrowserStateTrigger::ShowSearch;
 }
 
 void RomBrowserController::UpdateLastUsedFilepath()

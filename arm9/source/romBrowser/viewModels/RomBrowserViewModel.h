@@ -12,6 +12,7 @@ class RomBrowserViewModel
 {
 public:
     RomBrowserViewModel(IRomBrowserController* romBrowserController, const char* initialSelectedFileName = nullptr);
+    void Refresh(const char* initialSelectedFileName = nullptr);
 
     IRomBrowserController* GetRomBrowserController() const { return _romBrowserController; }
     FileInfoManager& GetFileInfoManager() const { return *_fileInfoManager; }
@@ -32,4 +33,6 @@ private:
     std::unique_ptr<FileInfoManager> _fileInfoManager;
     int _selectedItem = -1;
     u32 _iconFrameCounter = 0;
+
+    void BuildFileInfoManager(const char* initialSelectedFileName);
 };
