@@ -229,11 +229,11 @@ void SearchBottomSheetView::UpdateStatusLabel()
     if (_viewModel->GetQueryLength() == 0)
     {
         _secondaryLabel.SetText(u"Type to search");
-    }
-    else
+    } else
     {
-        _secondaryLabel.SetText(u"Placeholder results mode");
+        _secondaryLabel.SetText(u"Press OK to apply search");
     }
+
 }
 
 int SearchBottomSheetView::GetKeyIndexFromView(const SharedPtr<View>& view) const
