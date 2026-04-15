@@ -44,4 +44,6 @@ private:
 
     RomBrowserAppBarViewModel* _viewModel;
     std::unique_ptr<AppBarView> _appBarView;
+    u32 _searchIconVramOffset = 0;
+    u32 _searchOffIconVramOffset = 0;
 };

@@ -351,8 +351,19 @@ void App::HandleShowSearchTrigger()
 void App::HandleHideSearchTrigger()
 {
     _dialogPresenter.CloseDialog();
+
+    auto displayMode = RomBrowserDisplayModeFactory().GetRomBrowserDisplayMode(
+        _romBrowserController.GetRomBrowserDisplaySettings().layout);
+    _romBrowserTopScreenView = std::make_unique<RomBrowserTopScreenView>(
+        _romBrowserController.GetRomBrowserViewModel(),
+        displayMode,
+        _materialThemeFileIconFactory.get(),
+        _theme->GetRomBrowserViewFactory());
+    _romBrowserTopScreenView->InitVram(_subVramContext);
+
     _romBrowserBottomScreenView->RomBrowserViewModelInvalidated(_mainVramContext);
-    _romBrowserBottomScreenView->Focus(_focusManager);
+    if (!_dialogPresenter.GetOldFocus())
+        _romBrowserBottomScreenView->Focus(_focusManager);
 }
 
 void App::HandleNavigateTrigger()

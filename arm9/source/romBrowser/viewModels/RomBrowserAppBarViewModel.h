@@ -23,9 +23,9 @@ public:
         _romBrowserController->ShowSearch();
     }
 
-    void HideSearch()
+    IRomBrowserController* GetRomBrowserController() const
     {
-        _romBrowserController->HideSearch();
+        return _romBrowserController;
     }
 
     constexpr RomBrowserLayout GetRomBrowserLayout() const
