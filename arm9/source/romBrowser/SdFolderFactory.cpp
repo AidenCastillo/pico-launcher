@@ -5,6 +5,7 @@
 #include "FileType/Folder/FolderFileType.h"
 #include "SdFolderFactory.h"
 #include "string.h"
+#if defined(DEBUG)
 namespace
 {
     std::unique_ptr<SdFolder> CreateSearchTestFolder(const IFileTypeProvider* fileTypeProvider)
@@ -38,6 +39,7 @@ namespace
         return std::make_unique<SdFolder>(fileInfos, count);
     }
 }
+#endif
 
 std::unique_ptr<SdFolder> SdFolderFactory::CreateFromPath(const char* path) const
 {

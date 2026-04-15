@@ -39,6 +39,8 @@ private:
 
     RomBrowserAppBarViewModel* _viewModel;
     SharedPtr<AppBarView> _appBarView;
+    u32 _searchIconVramOffset = 0;
+    u32 _searchOffIconVramOffset = 0;
 
     RomBrowserAppBarView(
         RomBrowserAppBarViewModel* viewModel, const RomBrowserDisplayMode& displayMode,

@@ -44,6 +44,12 @@ public:
     /// @brief Clears the query string.
     void ClearQuery();
 
+    /// @brief Toggles the search panel visibility.
+    void ToggleSearch();
+
+    /// @brief Returns whether the search panel is active.
+    bool IsSearchActive() const;
+
     /// @brief Gets the current query.
     const char* GetQuery() const { return _query; }
 

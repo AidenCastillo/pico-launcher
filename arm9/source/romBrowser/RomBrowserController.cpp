@@ -94,14 +94,18 @@ void RomBrowserController::SetSearchQuery(const char* query)
 
 void RomBrowserController::RefreshRomBrowserViewModel()
 {
+    const char* selectedFileName = nullptr;
     if (_romBrowserViewModel.IsValid())
     {
-        _romBrowserViewModel->Refresh();
+        int selectedItem = _romBrowserViewModel->GetSelectedItem();
+        const auto& fileInfoManager = _romBrowserViewModel->GetFileInfoManager();
+        if (selectedItem >= 0 && selectedItem < (int)fileInfoManager.GetItemCount())
+        {
+            selectedFileName = fileInfoManager.GetItem(selectedItem).GetFileName();
+        }
     }
-    else
-    {
-        _romBrowserViewModel = SharedPtr<RomBrowserViewModel>::MakeShared(this);
-    }
+
+    _romBrowserViewModel = SharedPtr<RomBrowserViewModel>::MakeShared(this, selectedFileName);
 }
 
 void RomBrowserController::SetRomBrowserDisplaySettings(
@@ -258,13 +262,11 @@ void RomBrowserController::HandleChangeDisplayModeTrigger()
 void RomBrowserController::HandleShowSearchTrigger()
 {
     LOG_DEBUG("RomBrowserStateTrigger::ShowSearch\n");
-    _romBrowserViewModel = SharedPtr<RomBrowserViewModel>::MakeShared(this);
 }
 
 void RomBrowserController::HandleHideSearchTrigger()
 {
     LOG_DEBUG("RomBrowserStateTrigger::HideSearch\n");
-    _romBrowserViewModel = SharedPtr<RomBrowserViewModel>::MakeShared(this);
 }
 
 bool RomBrowserController::IsSearchOpenFromStateMachine() const

@@ -5,7 +5,6 @@
 SearchViewModel::SearchViewModel(IRomBrowserController* romBrowserController)
     : _romBrowserController(romBrowserController)
 {
-    LOG_DEBUG("SearchViewModel initialized (placeholder)\n");
 }
 
 void SearchViewModel::ActivateSelectedItem()
@@ -69,4 +68,23 @@ void SearchViewModel::ClearQuery()
     _queryLength = 0;
     _state = State::NoResults;
     LOG_DEBUG("Search query cleared\n");
+}
+
+void SearchViewModel::ToggleSearch()
+{
+    if (IsSearchActive())
+    {
+        _romBrowserController->SetSearchQuery("");
+        _romBrowserController->RefreshRomBrowserViewModel();
+        _romBrowserController->HideSearch();
+        return;
+    }
+
+    _romBrowserController->ShowSearch();
+}
+
+bool SearchViewModel::IsSearchActive() const
+{
+    const char* query = _romBrowserController->GetSearchQuery();
+    return query && query[0] != 0;
 }
