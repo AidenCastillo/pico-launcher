@@ -343,7 +343,7 @@ void App::HandleHideDisplaySettingsTrigger()
 void App::HandleShowSearchTrigger()
 {
     auto searchViewModel = std::make_unique<SearchViewModel>(&_romBrowserController);
-    auto searchDialog = std::make_unique<SearchBottomSheetView>(
+    auto searchDialog = SearchBottomSheetView::CreateShared(
         std::move(searchViewModel), &_theme->GetMaterialColorScheme(), _theme->GetFontRepository(), &_focusManager);
     _dialogPresenter.ShowDialog(std::move(searchDialog));
 }
@@ -352,9 +352,12 @@ void App::HandleHideSearchTrigger()
 {
     _dialogPresenter.CloseDialog();
 
+    _romBrowserTopScreenView.Reset();
+    RestoreVramState(_vramStateAfterMakeBottomScreenView);
+
     auto displayMode = RomBrowserDisplayModeFactory().GetRomBrowserDisplayMode(
         _romBrowserController.GetRomBrowserDisplaySettings().layout);
-    _romBrowserTopScreenView = std::make_unique<RomBrowserTopScreenView>(
+    _romBrowserTopScreenView = RomBrowserTopScreenView::CreateShared(
         _romBrowserController.GetRomBrowserViewModel(),
         displayMode,
         _materialThemeFileIconFactory.get(),

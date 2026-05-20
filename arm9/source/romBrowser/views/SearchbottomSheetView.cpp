@@ -7,13 +7,13 @@
 #include "SearchBottomSheetView.h"
 
 #define TITLE_LABEL_X               20
-#define TITLE_LABEL_Y               16
+#define TITLE_LABEL_Y               12
 #define SEARCH_LABEL_X              20
-#define SEARCH_LABEL_Y              38
+#define SEARCH_LABEL_Y              34
 #define STATUS_LABEL_X              20
-#define STATUS_LABEL_Y              58
+#define STATUS_LABEL_Y              54
 #define KEYBOARD_X                  16
-#define KEYBOARD_Y                  78
+#define KEYBOARD_Y                  74
 #define KEY_WIDTH                   28
 #define KEY_HEIGHT                  16
 #define KEY_GAP_X                   2
@@ -68,19 +68,20 @@ SearchBottomSheetView::SearchBottomSheetView(std::unique_ptr<SearchViewModel> vi
     const MaterialColorScheme* materialColorScheme, const IFontRepository* fontRepository,
     FocusManager* focusManager)
     : _viewModel(std::move(viewModel))
-    , _titleLabel(160, 16, 32, fontRepository->GetFont(FontType::Medium11))
-    , _searchLabel(216, 16, SearchViewModel::QUERY_MAX_LENGTH + 2, fontRepository->GetFont(FontType::Regular10))
-    , _secondaryLabel(220, 16, 64, fontRepository->GetFont(FontType::Regular10))
+    , _titleLabel(Label2DView::CreateShared(160, 16, 32, fontRepository->GetFont(FontType::Medium11)))
+    , _searchLabel(Label2DView::CreateShared(216, 16, SearchViewModel::QUERY_MAX_LENGTH + 2,
+        fontRepository->GetFont(FontType::Regular10)))
+    , _secondaryLabel(Label2DView::CreateShared(220, 16, 64, fontRepository->GetFont(FontType::Regular10)))
     , _materialColorScheme(materialColorScheme)
     , _focusManager(focusManager)
 {
-    _titleLabel.SetText(u"Search");
-    _searchLabel.SetText(u"> ");
-    _secondaryLabel.SetText(u"Enter text and press OK to close");
-    _secondaryLabel.SetEllipsisStyle(LabelView::EllipsisStyle::Ellipsis);
-    AddChildTail(&_titleLabel);
-    AddChildTail(&_searchLabel);
-    AddChildTail(&_secondaryLabel);
+    _titleLabel->SetText(u"Search");
+    _searchLabel->SetText(u"> ");
+    _secondaryLabel->SetText(u"Enter text and press OK to close");
+    _secondaryLabel->SetEllipsisStyle(LabelView::EllipsisStyle::Ellipsis);
+    AddChildTail(_titleLabel.GetPointer());
+    AddChildTail(_searchLabel.GetPointer());
+    AddChildTail(_secondaryLabel.GetPointer());
 
     for (int i = 0; i < KEY_COUNT; i++)
     {
@@ -95,6 +96,11 @@ SearchBottomSheetView::SearchBottomSheetView(std::unique_ptr<SearchViewModel> vi
     UpdateStatusLabel();
 }
 
+void SearchBottomSheetView::Close()
+{
+    _viewModel->Close();
+}
+
 void SearchBottomSheetView::InitVram(const VramContext& vramContext)
 {
     BottomSheetView::InitVram(vramContext);
@@ -102,9 +108,9 @@ void SearchBottomSheetView::InitVram(const VramContext& vramContext)
 
 void SearchBottomSheetView::Update()
 {
-    _titleLabel.SetPosition(TITLE_LABEL_X, _position.y + TITLE_LABEL_Y);
-    _searchLabel.SetPosition(SEARCH_LABEL_X, _position.y + SEARCH_LABEL_Y);
-    _secondaryLabel.SetPosition(STATUS_LABEL_X, _position.y + STATUS_LABEL_Y);
+    _titleLabel->SetPosition(TITLE_LABEL_X, _position.y + TITLE_LABEL_Y);
+    _searchLabel->SetPosition(SEARCH_LABEL_X, _position.y + SEARCH_LABEL_Y);
+    _secondaryLabel->SetPosition(STATUS_LABEL_X, _position.y + STATUS_LABEL_Y);
 
     for (int i = 0; i < KEY_COUNT; i++)
     {
@@ -125,14 +131,14 @@ void SearchBottomSheetView::Draw(GraphicsContext& graphicsContext)
     graphicsContext.SetClipArea(GetBounds());
     u32 oldPrio = graphicsContext.SetPriority(1);
 
-    _titleLabel.SetBackgroundColor(backColor);
-    _titleLabel.SetForegroundColor(_materialColorScheme->onSurface);
+    _titleLabel->SetBackgroundColor(backColor);
+    _titleLabel->SetForegroundColor(_materialColorScheme->onSurface);
 
-    _searchLabel.SetBackgroundColor(_materialColorScheme->GetColor(md::sys::color::surfaceBright));
-    _searchLabel.SetForegroundColor(_materialColorScheme->onSurface);
+    _searchLabel->SetBackgroundColor(_materialColorScheme->GetColor(md::sys::color::surfaceBright));
+    _searchLabel->SetForegroundColor(_materialColorScheme->onSurface);
 
-    _secondaryLabel.SetBackgroundColor(backColor);
-    _secondaryLabel.SetForegroundColor(_materialColorScheme->onSurfaceVariant);
+    _secondaryLabel->SetBackgroundColor(backColor);
+    _secondaryLabel->SetForegroundColor(_materialColorScheme->onSurfaceVariant);
 
     for (int i = 0; i < KEY_COUNT; i++)
     {
@@ -221,17 +227,17 @@ void SearchBottomSheetView::UpdateQueryLabel()
     {
         _queryBuffer[i + 2] = static_cast<char16_t>(query[i]);
     }
-    _searchLabel.SetText(_queryBuffer.data());
+    _searchLabel->SetText(_queryBuffer.data());
 }
 
 void SearchBottomSheetView::UpdateStatusLabel()
 {
     if (_viewModel->GetQueryLength() == 0)
     {
-        _secondaryLabel.SetText(u"Type to search");
+        _secondaryLabel->SetText(u"Type to search");
     } else
     {
-        _secondaryLabel.SetText(u"Press OK to apply search");
+        _secondaryLabel->SetText(u"Press OK to apply search");
     }
 
 }

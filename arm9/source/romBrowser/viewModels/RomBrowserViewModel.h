@@ -27,6 +27,7 @@ public:
     void SetIconFrameCounter(u32 iconFrameCounter) { _iconFrameCounter = iconFrameCounter; }
 
     void NavigateUp();
+    void ShowGameInfo();
 
 private:
     IRomBrowserController* _romBrowserController;

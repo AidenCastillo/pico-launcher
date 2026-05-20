@@ -12,6 +12,9 @@ class RomBrowserAppBarView : public ViewContainer
 
 public:
     void InitVram(const VramContext& vramContext) override;
+    void Update() override;
+    void Draw(GraphicsContext& graphicsContext) override;
+    void VBlank() override;
 
     Rectangle GetBounds() const override
     {

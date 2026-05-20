@@ -12,6 +12,7 @@ class IFontRepository;
 /// @brief Bottom sheet placeholder for search.
 class SearchBottomSheetView : public BottomSheetView
 {
+    SHARED_ONLY(SearchBottomSheetView)
 public:
     SearchBottomSheetView(std::unique_ptr<SearchViewModel> viewModel,
         const MaterialColorScheme* materialColorScheme, const IFontRepository* fontRepository,
@@ -28,6 +29,9 @@ public:
     {
         focusManager.Focus(_keyLabels[_selectedKey]);
     }
+
+protected:
+    void Close() override;
 
 private:
     enum class KeyType
@@ -51,9 +55,9 @@ private:
     static constexpr int KEY_COUNT = KEYBOARD_COLS * KEYBOARD_ROWS;
 
     std::unique_ptr<SearchViewModel> _viewModel;
-    Label2DView _titleLabel;
-    Label2DView _searchLabel;
-    Label2DView _secondaryLabel;
+    SharedPtr<Label2DView> _titleLabel;
+    SharedPtr<Label2DView> _searchLabel;
+    SharedPtr<Label2DView> _secondaryLabel;
     std::array<SharedPtr<Label2DView>, KEY_COUNT> _keyLabels;
     const MaterialColorScheme* _materialColorScheme;
     FocusManager* _focusManager;
